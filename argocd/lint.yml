@@ -1,0 +1,9 @@
+name: "argocd-prettier"
+description: "Users prettier to check the .deploy contents"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actionsx/prettier@v2
+      with:
+        args: --check ./deploy

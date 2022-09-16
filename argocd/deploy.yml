@@ -1,0 +1,51 @@
+name: "argocd-deploy"
+description: "Updates the docker tag to the latest commit and call argocd to sync the config"
+
+runs:
+  using: "composite"
+  steps:
+    - id: overlay
+      shell: bash
+      run: |
+        if [ "$GIT_REF" == "development" ]; then
+          echo ::set-output name=path::deploy/overlays/euc1-testing
+          echo ::set-output name=token::$EUC1TESTING_TOKEN
+        elif [ "$GIT_REF" == "master" ]; then
+          echo ::set-output name=path::deploy/overlays/euc1-staging
+          echo ::set-output name=token::$EUC1STAGING_TOKEN
+        elif [ "$GIT_REF" == "production" ]; then
+          echo ::set-output name=path::deploy/overlays/euc1
+          echo ::set-output name=token::$EUC1_TOKEN
+        fi
+      env:
+        GIT_REF: ${{ github.ref_name }}
+
+    - uses: actions/checkout@v3
+    - uses: imranismail/setup-kustomize@v1
+      with:
+        kustomize-version: "4.4.0"
+
+    - name: Update overlay with new image tag
+      run:  | 
+        cd $TARGET
+        kustomize edit set image $IMAGE=:$TAG
+        cat kustomization.yml
+      shell: bash
+      env:
+        TARGET: ${{ steps.overlay.outputs.path }}
+        IMAGE: ${{ env.CI_REGISTRY_IMAGE }}
+        TAG: ${{ github.sha }}
+
+    - uses: actionsx/prettier@v2
+      with:
+        args: --write ${{ steps.overlay.outputs.path }}/kustomization.yml
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.overlay.outputs.path }}
+
+    - run: docker run argoproj/argocd:v2.4.11 argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN
+      shell: bash
+      env: 
+        SERVER: ${{ steps.argocd.outputs.server-url }}
+        AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
