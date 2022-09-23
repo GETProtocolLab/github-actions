@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted, ubuntu20.04-self]
     steps:
       # Setup
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # we need to replace `/` in the branch name with `-` to make it compatible with docker registry tags
       - name: serialize branch name
