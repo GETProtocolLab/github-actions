@@ -35,9 +35,9 @@ jobs:
           EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
 
-      - uses: ../../argocd-diff
-        with:
-          argocd_server: ${{ steps.argocd.outputs.server-url }}
-          argocd_token: ${{ steps.argocd.outputs.token }}
-          argocd_lovely_plugin_token: ${{ secrets.GH_PACKAGES_ACCESS }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      # - uses: ../../argocd-diff
+      #   with:
+      #     argocd_server: ${{ steps.argocd.outputs.server-url }}
+      #     argocd_token: ${{ steps.argocd.outputs.token }}
+      #     argocd_lovely_plugin_token: ${{ secrets.GH_PACKAGES_ACCESS }}
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
