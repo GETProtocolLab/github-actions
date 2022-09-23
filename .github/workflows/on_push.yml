@@ -3,11 +3,11 @@ name: Workflow for building and deploying containers in argocd
 on:
   workflow_call:
     inputs:
-      image: 
+      image:
         required: true
         type: string
       argocd_app_name:
-        required: true 
+        required: true
         type: string
 
 jobs:
@@ -49,7 +49,7 @@ jobs:
     runs-on: [self-hosted, ubuntu20.04-self]
     needs: build
     if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production'
-    steps: 
+    steps:
       - id: argocd
         shell: bash
         run: |
