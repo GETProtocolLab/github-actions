@@ -35,9 +35,15 @@ jobs:
           EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
 
-      # - uses: ../../argocd-diff
-      #   with:
-      #     argocd_server: ${{ steps.argocd.outputs.server-url }}
-      #     argocd_token: ${{ steps.argocd.outputs.token }}
-      #     argocd_lovely_plugin_token: ${{ secrets.GH_PACKAGES_ACCESS }}
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
+      - uses: imranismail/setup-kustomize@v1
+
+      - uses: GETProtocolLab/argocd-diff-action@master
+        name: ArgoCD Diff testing
+        with:
+          argocd-server-url: ${{ steps.argocd.outputs.server-url }}
+          argocd-token: ${{ steps.argocd.outputs.token }}
+          argocd-version: v2.1.6
+          argocd-extra-cli-args: --grpc-web
+          argocd-lovely-plugin-token: ${{ secrets.GH_PACKAGES_ACCESS }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

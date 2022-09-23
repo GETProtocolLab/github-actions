@@ -14,7 +14,8 @@ jobs:
   build:
     runs-on: [self-hosted, ubuntu20.04-self]
     steps:
-      - uses: actions/checkout@v3
+      # Setup
+      - uses: actions/checkout@v2
 
       # we need to replace `/` in the branch name with `-` to make it compatible with docker registry tags
       - name: serialize branch name
@@ -22,16 +23,17 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${{ github.ref_name }} | sed 's/\//-/g')"
         id: serialize_branch
 
-      # - name: Build image using docker-build action
-      #   uses: ../../docker-build
-      #   with:
-      #     password: ${{ secrets.GITHUB_TOKEN }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ steps.serialize_branch.outputs.branch }}
-      #     build_args: |
-      #       REPO_AUTH=${{ secrets.GH_ACCESS_TOKEN }}
-      #     extra_tags: |
-      #       ${{ inputs.image }}:${{ github.sha }}
+      # Build Docker images
+      - name: Build image using docker-build action
+        uses: GETProtocolLab/docker-build-action@v1.0.4
+        with:
+          password: ${{ secrets.GITHUB_TOKEN }}
+          image: ${{ inputs.image }}
+          tag: ${{ steps.serialize_branch.outputs.branch }}
+          build_args: |
+            REPO_AUTH=${{ secrets.GH_ACCESS_TOKEN }}
+          extra_tags: |
+            ${{ inputs.image }}:${{ github.sha }}
 
   deploy-argocd:
     runs-on: [self-hosted, ubuntu20.04-self]
@@ -60,11 +62,31 @@ jobs:
           EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
 
-      # - uses: ../../argocd-deploy
-      #   with:
-      #     image: ${{ inputs.image }}
-      #     image_tag: ${{ github.sha }}
-      #     overlay: ${{ steps.argocd.outputs.overlay }}
-      #     argocd_server: ${{ steps.argocd.outputs.server-url }}
-      #     argocd_token: ${{ steps.argocd.outputs.token }}
-      #     argocd_app: ${{ inputs.argocd_app_name }}
+      - uses: actions/checkout@v3
+      - uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: "4.4.0"
+
+      - name: Update overlay with new image tag
+        run:  | 
+          cd $TARGET
+          kustomize edit set image $IMAGE=:$TAG
+          cat kustomization.yml
+        shell: bash
+        env:
+          TARGET: ${{ steps.argocd.outputs.path }}
+          IMAGE: ${{ inputs.image }}
+          TAG: ${{ github.sha }}
+
+      - uses: actionsx/prettier@v2
+        with:
+          args: --write ${{ steps.argocd.outputs.path }}/kustomization.yml
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.path }}
+
+      - run: argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN
+        env: 
+          SERVER: ${{ steps.argocd.outputs.server-url }}
+          AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
