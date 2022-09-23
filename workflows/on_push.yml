@@ -37,13 +37,13 @@ jobs:
       - name: Build image using docker-build action
         uses: ../docker-build
         with:
-          password: ${{ env.GITHUB_PASSWORD }}
-          image: ${{ env.CI_REGISTRY_IMAGE }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          image: ${{ inputs.image }}
           tag: ${{ steps.serialize_branch.outputs.branch }}
           build_args: |
-            REPO_AUTH=${{ env.REPO_AUTH }}
+            REPO_AUTH=${{ secrets.GH_ACCESS_TOKEN }}
           extra_tags: |
-            ${{ env.CI_REGISTRY_IMAGE }}:${{ github.sha }}
+            ${{ inputs.image }}:${{ github.sha }}
 
   deploy-argocd:
     runs-on: [self-hosted, ubuntu20.04-self]
