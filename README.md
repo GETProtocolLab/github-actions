@@ -11,7 +11,7 @@ The push workflow will handle building and deploying images.
 ### on_pr
 
 We will create 2 action files (one for pr and one for push).
-for the push one create a file called `.github/workflows/getprotocollab-push.yml`
+for the push one create a file called `.github/workflows/workflows-push.yml`
 
 ```yaml
 on: [push]
@@ -28,11 +28,12 @@ jobs:
       argocd_app_name: { { YOUR APP NAME IN ARGOCD } }
 ```
 
-for the pr one create a file called `.github/workflows/getprotocollab-pr.yml`
+for the pr one create a file called `.github/workflows/workflows-pr.yml`
 
 ```yaml
 permissions:
   id-token: write
+  contents: read
   pull-requests: write
 
 on:
