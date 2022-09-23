@@ -3,7 +3,8 @@
         "https://json.schemastore.org/github-action.json": [
             "file:///home/mark/projects/guts-ci/argocd/lint.yml",
             "file:///home/mark/projects/guts-ci/argocd/diff.yml",
-            "file:///home/mark/projects/guts-ci/argocd/deploy.yml"
+            "file:///home/mark/projects/guts-ci/argocd/deploy.yml",
+            "file:///home/mark/projects/guts-ci/guts-cd/push.yml"
         ]
     }
 }
