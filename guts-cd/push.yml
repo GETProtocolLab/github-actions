@@ -38,12 +38,12 @@ inputs:
     required: true
   argocd_euc1_token:
     description: "The token to authenticate to argocd server"
-    required: true    
+    required: true
   # Argocd deploy
   overlay:
     description: "the kustomize directory to deploy"
     required: true
-  image: 
+  image:
     description: "the image that should be updated"
     required: true
   argocd_app:
@@ -65,7 +65,7 @@ runs:
 
     - id: argocd
       shell: bash
-      if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production' 
+      if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production'
       run: |
         if [ "$GIT_REF" == "development" ]; then
           echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
@@ -91,8 +91,7 @@ runs:
       with:
         image: ${{ inputs.image }}
         image_tag: ${{ github.sha }}
-        overlay:  ${{ steps.argocd.outputs.overlay }}
+        overlay: ${{ steps.argocd.outputs.overlay }}
         argocd_server: ${{ steps.argocd.outputs.server-url }}
         argocd_token: ${{ steps.argocd.outputs.token }}
         argocd_app: ${{ inputs.argocd_app }}
-        

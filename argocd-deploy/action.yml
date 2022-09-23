@@ -4,7 +4,7 @@ inputs:
   overlay:
     description: "the kustomize directory to deploy"
     required: true
-  image: 
+  image:
     description: "the image that should be updated"
     required: true
   image_tag:
@@ -18,7 +18,7 @@ inputs:
     required: true
   argocd_app:
     description: "The app to sync"
-    required: true    
+    required: true
 
 runs:
   using: "composite"
@@ -26,7 +26,7 @@ runs:
     - uses: imranismail/setup-kustomize@v1
 
     - name: Update overlay with new image tag
-      run:  | 
+      run: |
         cd $TARGET
         kustomize edit set image $IMAGE=:$TAG
         cat kustomization.yml
@@ -46,7 +46,7 @@ runs:
 
     - run: docker run argoproj/argocd:v2.4.11 argocd app sync $ARGOCD_APP --grpc-web --server $SERVER --auth-token $AUTH_TOKEN
       shell: bash
-      env: 
+      env:
         ARGOCD_APP: ${{ inputs.argocd_app }}
         SERVER: ${{ inputs.argocd_server }}
         AUTH_TOKEN: ${{ inputs.argocd_token }}
