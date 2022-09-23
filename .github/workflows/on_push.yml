@@ -68,7 +68,7 @@ jobs:
           kustomize-version: "4.4.0"
 
       - name: Update overlay with new image tag
-        run:  | 
+        run: |
           cd $TARGET
           kustomize edit set image $IMAGE=:$TAG
           cat kustomization.yml
@@ -87,6 +87,6 @@ jobs:
           commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.path }}
 
       - run: argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN
-        env: 
+        env:
           SERVER: ${{ steps.argocd.outputs.server-url }}
           AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
