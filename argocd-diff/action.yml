@@ -16,10 +16,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actionsx/prettier@v2
-      with:
-        args: --check ./deploy
-
     - uses: imranismail/setup-kustomize@v1
       with:
         kustomize-version: "4.4.0"

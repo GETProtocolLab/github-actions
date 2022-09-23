@@ -5,6 +5,11 @@
       "file:///home/mark/projects/guts-ci/argocd/diff.yml",
       "file:///home/mark/projects/guts-ci/argocd/deploy.yml",
       "file:///home/mark/projects/guts-ci/guts-cd/push.yml"
+    ],
+    "https://json.schemastore.org/github-workflow.json": [
+      "file:///home/mark/projects/github-actions/workflows/build_and_deploy.yml",
+      "file:///home/mark/projects/github-actions/workflows/push.yml",
+      "file:///home/mark/projects/github-actions/workflows/lint_and_diff.yml"
     ]
   }
 }
