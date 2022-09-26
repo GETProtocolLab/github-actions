@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   prettier:
-    runs-on: [self-hosted, ubuntu20.04-self]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
