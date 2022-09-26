@@ -1,0 +1,9 @@
+{
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": [
+      "file:///home/mark/projects/github-actions/workflows/lint.yml",
+      "file:///home/mark/projects/github-actions/workflows/on_pr.yml",
+      "file:///home/mark/projects/github-actions/workflows/on_push.yml"
+    ]
+  }
+}
