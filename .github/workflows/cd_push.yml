@@ -86,7 +86,7 @@ jobs:
         with:
           commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}
 
-      - run: argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN
+      - run: docker run argoproj/argocd argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN
         env:
           SERVER: ${{ steps.argocd.outputs.server-url }}
           AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
