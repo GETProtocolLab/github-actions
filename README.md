@@ -13,9 +13,21 @@ To use the CD workflows include them in your repository like this.
 ```yaml
 permissions:
   id-token: write
-  contents: read
-  pull-requests: write
+  actions: write
+  checks: write
+  contents: write
+  deployments: write
+  discussions: write
+  issues: write
+  metadata: read
   packages: write
+  pages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
+
+
 
 on:
   push:
