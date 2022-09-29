@@ -1,4 +1,4 @@
-# Desription
+# Description
 
 Repository for general workflows in the getprotocolab repo that handles CI/CD tasks
 
