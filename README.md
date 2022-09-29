@@ -27,8 +27,6 @@ permissions:
   security-events: write
   statuses: write
 
-
-
 on:
   push:
   pull_request:
