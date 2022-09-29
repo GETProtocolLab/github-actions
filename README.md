@@ -38,8 +38,6 @@ jobs:
       argocd_app_name: {{ your_argocd_app_name}}
 
 ```
-
-for the pr one create a file called `.github/workflows/workflows-pr.yml`
 ## Lint
 
 ```bash
