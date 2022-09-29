@@ -11,22 +11,6 @@ This workflows only works if your repo includes a Dockerfile, has been included 
 
 To use the CD workflows include them in your repository like this.
 ```yaml
-permissions:
-  id-token: write
-  actions: write
-  checks: write
-  contents: write
-  deployments: write
-  discussions: write
-  issues: write
-  metadata: read
-  packages: write
-  pages: write
-  pull-requests: write
-  repository-projects: write
-  security-events: write
-  statuses: write
-
 on:
   push:
   pull_request:
