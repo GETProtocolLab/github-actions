@@ -38,6 +38,9 @@ jobs:
   deploy-argocd:
     runs-on: [self-hosted, ubuntu20.04-self]
     needs: build
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production'
     steps:
       - id: argocd
