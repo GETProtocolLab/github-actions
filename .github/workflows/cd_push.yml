@@ -74,17 +74,17 @@ jobs:
           cat kustomization.yml
         shell: bash
         env:
-          TARGET: ${{ steps.argocd.outputs.path }}
+          TARGET: ${{ steps.argocd.outputs.overlay }}
           IMAGE: ${{ inputs.image }}
           TAG: ${{ github.sha }}
 
       - uses: actionsx/prettier@v2
         with:
-          args: --write ${{ steps.argocd.outputs.path }}/kustomization.yml
+          args: --write ${{ steps.argocd.outputs.overlay }}/kustomization.yml
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.path }}
+          commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}
 
       - run: argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN
         env:
