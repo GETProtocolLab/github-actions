@@ -4,32 +4,12 @@ Repository for general workflows in the getprotocolab repo that handles CI/CD ta
 
 ## How to use
 
-You need to setup 2 workflow files. 1 for PR's and 1 for push.
-The PR workflow will handle adding info to PR requests like argocd diff and linting.
-The push workflow will handle building and deploying images.
+### cd (cd_pr/cd_push)
+The CD workflows will build and deploy your repo to the guts argocd clusters. It will also preview your k8s changes when making a PR to the deploy branches.
 
-### on_pr
+This workflows only works if your repo includes a Dockerfile, has been included in the k8seks argocd apps and contains a `./deploy` kustomize directory with k8s config.
 
-We will create 2 action files (one for pr and one for push).
-for the push one create a file called `.github/workflows/workflows-push.yml`
-
-```yaml
-on: [push]
-
-concurrency:
-  group: ${{ github.ref }}
-
-jobs:
-  push_workflow:
-    uses: GETProtocolLab/workflows/.github/workflows/on_pr.yml@master
-    secrets: inherit
-    with:
-      image: ghcr.io/getprotocollab/oesophagus
-      argocd_app_name: { { YOUR APP NAME IN ARGOCD } }
-```
-
-for the pr one create a file called `.github/workflows/workflows-pr.yml`
-
+To use the CD workflows include them in your repository like this.
 ```yaml
 permissions:
   id-token: write
@@ -37,19 +17,29 @@ permissions:
   pull-requests: write
 
 on:
+  push:
   pull_request:
-    types: [opened, synchronize, reopened]
-
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   pr_workflow:
-    uses: GETProtocolLab/workflows/.github/workflows/on_pr.yml@master
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
+    if: github.event_name == 'pull_request'
+    uses: GETProtocolLab/workflows/.github/workflows/cd_pr.yml@master
     secrets: inherit
+
+  push_workflow:
+    if: github.event_name == 'push'
+    uses: GETProtocolLab/workflows/.github/workflows/cd_push.yml@master
+    secrets: inherit
+    with:
+      image: ghcr.io/getprotocollab/{{ your_repo }}
+      argocd_app_name: {{ your_argocd_app_name}}
+
 ```
 
+for the pr one create a file called `.github/workflows/workflows-pr.yml`
 ## Lint
 
 ```bash
