@@ -5,11 +5,13 @@ Repository for general workflows in the getprotocolab repo that handles CI/CD ta
 ## How to use
 
 ### cd (cd_pr/cd_push)
+
 The CD workflows will build and deploy your repo to the guts argocd clusters. It will also preview your k8s changes when making a PR to the deploy branches.
 
 This workflows only works if your repo includes a Dockerfile, has been included in the k8seks argocd apps and contains a `./deploy` kustomize directory with k8s config.
 
 To use the CD workflows include them in your repository like this.
+
 ```yaml
 on:
   push:
@@ -30,9 +32,9 @@ jobs:
     secrets: inherit
     with:
       image: ghcr.io/getprotocollab/{{ your_repo }}
-      argocd_app_name: {{ your_argocd_app_name}}
-
+      argocd_app_name: { { your_argocd_app_name } }
 ```
+
 ## Lint
 
 ```bash
