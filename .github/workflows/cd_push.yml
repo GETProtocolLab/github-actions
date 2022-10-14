@@ -100,7 +100,7 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}
+          commit_message: "[skip ci] Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}"
 
       # - run: docker run argoproj/argocd argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
       #   env:
