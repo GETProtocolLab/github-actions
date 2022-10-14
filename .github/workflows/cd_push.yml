@@ -58,6 +58,10 @@ jobs:
             echo ::set-output name=server-url::argocd.euc1.get-protocol.cloud
             echo ::set-output name=token::$EUC1_TOKEN
             echo ::set-output name=overlay::deploy/overlays/euc1
+          elif [ "$GIT_REF" == "feature/test-ci-app" ]; then
+            echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
+            echo ::set-output name=token::$EUC1TESTING_TOKEN
+            echo ::set-output name=overlay::deploy/overlays/euc1-testing
           fi
         env:
           GIT_REF: ${{ github.ref_name }}
