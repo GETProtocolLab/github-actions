@@ -41,7 +41,7 @@ jobs:
     concurrency:
       group: ${{ github.ref }}
       cancel-in-progress: true
-    if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production'
+    if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production' || github.ref_name == 'feature/test-ci-app'
     steps:
       - id: argocd
         shell: bash
@@ -65,7 +65,16 @@ jobs:
           EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
 
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.CI_APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+
       - uses: actions/checkout@v3
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
       - uses: imranismail/setup-kustomize@v1
         with:
           kustomize-version: "4.4.0"
@@ -89,7 +98,7 @@ jobs:
         with:
           commit_message: Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}
 
-      - run: docker run argoproj/argocd argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
-        env:
-          SERVER: ${{ steps.argocd.outputs.server-url }}
-          AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
+      # - run: docker run argoproj/argocd argocd app sync gus --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
+      #   env:
+      #     SERVER: ${{ steps.argocd.outputs.server-url }}
+      #     AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
