@@ -39,15 +39,6 @@ jobs:
           extra_tags: |
             ${{ inputs.image }}:${{ github.sha }}
 
-      # Run security checks on latest image built
-      - name: Dockle Security Check
-        uses: erzz/dockle-action@v1
-        with:
-          image: ${{ inputs.image }}:${{ github.sha }}
-          failure-threshold: fatal
-          exit-code: 1 # Stops pipeline if fatal issues found
-          accept-filenames: ${{ inputs.dockle_whitelist }}
-
   deploy-argocd:
     runs-on: [self-hosted, ubuntu20.04-self]
     needs: build
@@ -115,3 +106,17 @@ jobs:
         env:
           SERVER: ${{ steps.argocd.outputs.server-url }}
           AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
+
+  dockle-lint:
+    runs-on: [self-hosted, ubuntu20.04-self]
+    needs: build
+    if: github.ref_name != 'development' || github.ref_name != 'master' || github.ref_name != 'production'
+    steps:
+      # Run security checks on latest image built
+      - name: Dockle Security Check
+        uses: erzz/dockle-action@v1
+        with:
+          image: ${{ inputs.image }}:${{ github.sha }}
+          failure-threshold: fatal
+          exit-code: 1 # Stops pipeline if fatal issues found
+          accept-filenames: ${{ inputs.dockle_whitelist }}
