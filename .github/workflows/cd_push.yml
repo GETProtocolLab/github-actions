@@ -9,6 +9,10 @@ on:
       argocd_app_name:
         required: true
         type: string
+      dockle_whitelist:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -42,7 +46,7 @@ jobs:
           image: ${{ inputs.image }}:${{ github.sha }}
           failure-threshold: fatal
           exit-code: 1 # Stops pipeline if fatal issues found
-          accept-filenames: settings.py
+          accept-filenames: ${{ inputs.dockle_whitelist }}
 
   deploy-argocd:
     runs-on: [self-hosted, ubuntu20.04-self]
