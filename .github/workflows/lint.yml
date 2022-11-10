@@ -48,6 +48,6 @@ jobs:
       - name: Dockle Security Check
         uses: erzz/dockle-action@v1
         with:
-          image: ${{ inputs.image }}
+          image: ${{ inputs.image }}:${{ github.sha }}
           failure-threshold: fatal
           exit-code: 1 # Stops pipeline if fatal issues found
