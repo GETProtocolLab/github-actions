@@ -42,6 +42,7 @@ jobs:
           image: ${{ inputs.image }}:${{ github.sha }}
           failure-threshold: fatal
           exit-code: 1 # Stops pipeline if fatal issues found
+          accept-filenames: settings.py
 
   deploy-argocd:
     runs-on: [self-hosted, ubuntu20.04-self]
