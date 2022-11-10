@@ -35,6 +35,14 @@ jobs:
           extra_tags: |
             ${{ inputs.image }}:${{ github.sha }}
 
+      # Run security checks on latest image built
+      - name: Dockle Security Check
+        uses: erzz/dockle-action@v1
+        with:
+          image: ${{ inputs.image }}:${{ github.sha }}
+          failure-threshold: fatal
+          exit-code: 1 # Stops pipeline if fatal issues found
+
   deploy-argocd:
     runs-on: [self-hosted, ubuntu20.04-self]
     needs: build
