@@ -12,11 +12,9 @@ on:
         required: true
         type: string
       prettier:
-        required: true
         type: boolean
         default: true
       dockle:
-        required: true
         type: boolean
         default: true
 
