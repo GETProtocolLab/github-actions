@@ -17,6 +17,9 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, ubuntu20.04-self]
+    strategy:
+      matrix:
+        platform: ["linux/arm64", "linux/amd64"]
     steps:
       # Setup
       - uses: actions/checkout@v3
@@ -34,6 +37,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           image: ${{ inputs.image }}
           tag: ${{ steps.serialize_branch.outputs.branch }}
+          platforms: ${{ matrix.platform }}
           build_args: |
             REPO_AUTH=${{ secrets.GH_ACCESS_TOKEN }}
           extra_tags: |
