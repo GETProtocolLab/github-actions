@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: ""
+      github_token:
+        required: false
+        type: string
+        default: ${{ github.token }}
 
 jobs:
   build:
@@ -20,6 +24,8 @@ jobs:
     steps:
       # Setup
       - uses: actions/checkout@v3
+        with:
+          token: ${{ inputs.github_token }}
 
       # we need to replace `/` in the branch name with `-` to make it compatible with docker registry tags
       - name: serialize branch name
