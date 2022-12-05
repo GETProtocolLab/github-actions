@@ -13,19 +13,31 @@ on:
         required: false
         type: string
         default: ""
-      github_token:
+      private_dependencies:
         required: false
-        type: string
-        default: ${{ github.token }}
+        type: boolean
+        default: false
+        description: "Set to true if the project has private/internal dependencies"
 
 jobs:
   build:
     runs-on: [self-hosted, ubuntu20.04-self]
     steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        if: ${{ inputs.private_dependencies == 'true' }}
+        with:
+          app_id: ${{ secrets.WORKFLOWS_READONLY_GITHUB_APP_ID }}
+          private_key: ${{ secrets.WORKFLOWS_READONLY_GITHUB_APP_PRIVATE_KEY }}
+
+      - name: use Github App token for private dependencies
+        shell: bash
+        if: ${{ inputs.private_dependencies == 'true' }}
+        run: echo "GITHUB_TOKEN=${{ steps.generate_token.outputs.token }}" >> $GITHUB_ENV
+
       # Setup
       - uses: actions/checkout@v3
-        with:
-          token: ${{ inputs.github_token }}
 
       # we need to replace `/` in the branch name with `-` to make it compatible with docker registry tags
       - name: serialize branch name
