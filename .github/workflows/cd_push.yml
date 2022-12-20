@@ -106,7 +106,7 @@ jobs:
         env:
           SERVER: ${{ steps.argocd.outputs.server-url }}
           AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
-      
+
       # Only triggers if this job or its parent fails
       - name: Failure Slack Notification
         uses: rtCamp/action-slack-notify@v2
@@ -120,7 +120,6 @@ jobs:
           SLACK_USERNAME: github-actions-status
           SLACK_WEBHOOK: ${{ secrets.FAILURE_SLACK_WEBHOOK }}
           SLACK_ICON: https://github.com/GETProtocolLab.png?size=48
-
 
   dockle-lint:
     runs-on: [self-hosted, ubuntu20.04-self]
