@@ -42,7 +42,7 @@ jobs:
       # Only triggers if this job fails
       - name: Failure Slack Notification
         uses: rtCamp/action-slack-notify@v2
-        if: ${{ failure() }}
+        if: failure() && (github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production')
         env:
           SLACK_CHANNEL: taas-dev
           SLACK_COLOR: danger
