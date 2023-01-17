@@ -12,23 +12,15 @@ jobs:
         with:
           args: --check ./deploy
 
-  argocd_diff:
+  argocd_diff_testing:
     runs-on: [self-hosted, ubuntu20.04-self]
     if: github.base_ref  == 'development' || github.base_ref  == 'master' || github.base_ref  == 'production'
     steps:
       - id: argocd
         shell: bash
         run: |
-          if [ "$GIT_REF" == "development" ]; then
-            echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
-            echo ::set-output name=token::$EUC1TESTING_TOKEN
-          elif [ "$GIT_REF" == "master" ]; then
-            echo ::set-output name=server-url::argocd.euc1.s.get-protocol.dev
-            echo ::set-output name=token::$EUC1STAGING_TOKEN
-          elif [ "$GIT_REF" == "production" ]; then
-            echo ::set-output name=server-url::argocd.euc1.get-protocol.cloud
-            echo ::set-output name=token::$EUC1_TOKEN
-          fi
+          echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
+          echo ::set-output name=token::$EUC1TESTING_TOKEN
         env:
           GIT_REF: ${{ github.base_ref }}
           EUC1TESTING_TOKEN: ${{ secrets.ARGOCD_EUC1TESTING_API_AUTH }}
@@ -38,7 +30,35 @@ jobs:
       - uses: actions/checkout@v3
       - uses: imranismail/setup-kustomize@v1
 
-      - uses: GETProtocolLab/argocd-diff-action@master
+      - uses: GETProtocolLab/argocd-diff-action@feature/multiple-clusters
+        name: ArgoCD Diff testing
+        with:
+          argocd-server-url: ${{ steps.argocd.outputs.server-url }}
+          argocd-token: ${{ steps.argocd.outputs.token }}
+          argocd-version: v2.1.6
+          argocd-extra-cli-args: --grpc-web
+          argocd-lovely-plugin-token: ${{ secrets.GH_PACKAGES_ACCESS }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  argocd_diff_staging:
+    runs-on: [self-hosted, ubuntu20.04-self]
+    if: github.base_ref  == 'development' || github.base_ref  == 'master' || github.base_ref  == 'production'
+    steps:
+      - id: argocd
+        shell: bash
+        run: |
+          echo ::set-output name=server-url::argocd.euc1.s.get-protocol.dev
+          echo ::set-output name=token::$EUC1STAGING_TOKEN
+        env:
+          GIT_REF: ${{ github.base_ref }}
+          EUC1TESTING_TOKEN: ${{ secrets.ARGOCD_EUC1TESTING_API_AUTH }}
+          EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
+          EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
+
+      - uses: actions/checkout@v3
+      - uses: imranismail/setup-kustomize@v1
+
+      - uses: GETProtocolLab/argocd-diff-action@feature/multiple-clusters
         name: ArgoCD Diff testing
         with:
           argocd-server-url: ${{ steps.argocd.outputs.server-url }}
