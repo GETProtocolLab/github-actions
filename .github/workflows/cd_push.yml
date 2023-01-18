@@ -96,7 +96,7 @@ jobs:
       - name: Update overlay with new image tag
         run: |
           jq '.[]' -r <<< $DEPLOY_DIRS | while read i; do
-            cd $i/$TARGET
+            cd $GITHUB_WORKSPACE/$i/$TARGET
             kustomize edit set image $IMAGE=:$TAG
             cat kustomization.yml
           done
