@@ -9,10 +9,10 @@ on:
       argocd_app_name:
         required: true
         type: string
-      deploy_dir:
+      deploy_dirs:
         required: false
         type: string
-        default: "deploy"
+        default: '["deploy"]'
       dockle_whitelist:
         required: false
         type: string
@@ -57,13 +57,69 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.FAILURE_SLACK_WEBHOOK }}
           SLACK_ICON: https://github.com/GETProtocolLab.png?size=48
 
-  deploy-argocd:
+  update-kustomize:
     runs-on: [self-hosted, ubuntu20.04-self]
     needs: build
     concurrency:
       group: ${{ github.ref }}
       cancel-in-progress: true
     if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production' || github.ref_name  == 'feature/multiple-clusters'
+    steps:
+      - name: Select overlay
+        shell: bash
+        run: |
+          if [ "$GIT_REF" == "development" ] || [ "$GIT_REF" == "feature/multiple-clusters" ]; then
+            echo ::set-output name=overlay::overlays/euc1-testing
+          elif [ "$GIT_REF" == "master" ]; then
+            echo ::set-output name=overlay::overlays/euc1-staging
+          elif [ "$GIT_REF" == "production" ]; then
+            echo ::set-output name=overlay::overlays/euc1
+          fi
+        env:
+          GIT_REF: ${{ github.ref_name }}
+
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.WORKFLOWS_GITHUB_APP_ID }}
+          private_key: ${{ secrets.WORKFLOWS_GITHUB_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+      - uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: "4.4.0"
+
+      - name: Update overlay with new image tag
+        run: |
+          jq '.[]' -r <<< $DEPLOY_DIRS | while read i; do
+            cd $i/$TARGET
+            kustomize edit set image $IMAGE=:$TAG
+            cat kustomization.yml
+          done
+        shell: bash
+        env:
+          TARGET: ${{ steps.argocd.outputs.overlay }}
+          IMAGE: ${{ inputs.image }}
+          TAG: ${{ github.sha }}
+          DEPLOY_DIRS: ${{ inputs.deploy_dirs }}
+
+      - uses: actionsx/prettier@v2
+        with:
+          args: --write ${{ steps.argocd.outputs.overlay }}/kustomization.yml
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "[skip ci] Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}"
+  deploy-argocd:
+    runs-on: [self-hosted, ubuntu20.04-self]
+    needs: "update-kustomize"
+    strategy:
+      fail-fast: false
+      matrix:
+        DEPLOY_DIR: ${{ fromJSON(inputs.deploy_dirs) }}
     steps:
       - id: argocd
         shell: bash
@@ -86,40 +142,7 @@ jobs:
           EUC1TESTING_TOKEN: ${{ secrets.ARGOCD_EUC1TESTING_API_AUTH }}
           EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
-          DEPLOY_DIR: ${{ inputs.deploy_dir }}
-
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@v1
-        with:
-          app_id: ${{ secrets.WORKFLOWS_GITHUB_APP_ID }}
-          private_key: ${{ secrets.WORKFLOWS_GITHUB_APP_PRIVATE_KEY }}
-
-      - uses: actions/checkout@v3
-        with:
-          token: ${{ steps.generate_token.outputs.token }}
-      - uses: imranismail/setup-kustomize@v1
-        with:
-          kustomize-version: "4.4.0"
-
-      - name: Update overlay with new image tag
-        run: |
-          cd $TARGET
-          kustomize edit set image $IMAGE=:$TAG
-          cat kustomization.yml
-        shell: bash
-        env:
-          TARGET: ${{ steps.argocd.outputs.overlay }}
-          IMAGE: ${{ inputs.image }}
-          TAG: ${{ github.sha }}
-
-      - uses: actionsx/prettier@v2
-        with:
-          args: --write ${{ steps.argocd.outputs.overlay }}/kustomization.yml
-
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "[skip ci] Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}"
+          DEPLOY_DIR: ${{ matrix.DEPLOY_DIR }}
 
       - run: docker run argoproj/argocd argocd app sync ${{ inputs.argocd_app_name }} --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
         env:
