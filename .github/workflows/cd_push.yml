@@ -99,6 +99,7 @@ jobs:
             cd $GITHUB_WORKSPACE/$i/$TARGET
             kustomize edit set image $IMAGE=:$TAG
             cat kustomization.yml
+            npx prettier --write .
           done
         shell: bash
         env:
@@ -106,10 +107,6 @@ jobs:
           IMAGE: ${{ inputs.image }}
           TAG: ${{ github.sha }}
           DEPLOY_DIRS: ${{ inputs.deploy_dirs }}
-
-      - uses: actionsx/prettier@v2
-        with:
-          args: --write ${{ steps.argocd.outputs.overlay }}/kustomization.yml
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
