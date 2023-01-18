@@ -93,6 +93,10 @@ jobs:
         with:
           kustomize-version: "4.4.0"
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
       - name: Update overlay with new image tag
         run: |
           jq '.[]' -r <<< $DEPLOY_DIRS | while read i; do
