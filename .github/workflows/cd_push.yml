@@ -63,13 +63,13 @@ jobs:
     concurrency:
       group: ${{ github.ref }}
       cancel-in-progress: true
-    if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production' || github.ref_name  == 'feature/multiple-clusters'
+    if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production'
     steps:
       - id: argocd
         name: Select overlay
         shell: bash
         run: |
-          if [ "$GIT_REF" == "development" ] || [ "$GIT_REF" == "feature/multiple-clusters" ]; then
+          if [ "$GIT_REF" == "development" ]; then
             echo ::set-output name=overlay::overlays/euc1-testing
           elif [ "$GIT_REF" == "master" ]; then
             echo ::set-output name=overlay::overlays/euc1-staging
@@ -126,7 +126,7 @@ jobs:
       - id: argocd
         shell: bash
         run: |
-          if [ "$GIT_REF" == "development" ] || [ "$GIT_REF" == "feature/multiple-clusters" ]; then
+          if [ "$GIT_REF" == "development" ]; then
             echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
             echo ::set-output name=token::$EUC1TESTING_TOKEN
           elif [ "$GIT_REF" == "master" ]; then
