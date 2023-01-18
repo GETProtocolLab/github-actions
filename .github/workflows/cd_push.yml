@@ -63,7 +63,7 @@ jobs:
     concurrency:
       group: ${{ github.ref }}
       cancel-in-progress: true
-    if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production'
+    if: github.ref_name  == 'development' || github.ref_name  == 'master' || github.ref_name  == 'production' || github.ref_name  == 'feature/multiple-clusters'
     steps:
       - id: argocd
         shell: bash
