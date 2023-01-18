@@ -6,7 +6,7 @@ on:
       image:
         required: true
         type: string
-      argocd_app_name:
+      argocd_app_names:
         required: true
         type: string
       deploy_dirs:
@@ -121,7 +121,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        DEPLOY_DIR: ${{ fromJSON(inputs.deploy_dirs) }}
+        APP_NAME: ${{ fromJSON(inputs.argocd_app_names) }}
     steps:
       - id: argocd
         shell: bash
@@ -129,27 +129,24 @@ jobs:
           if [ "$GIT_REF" == "development" ] || [ "$GIT_REF" == "feature/multiple-clusters" ]; then
             echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
             echo ::set-output name=token::$EUC1TESTING_TOKEN
-            echo ::set-output name=overlay::$DEPLOY_DIR/overlays/euc1-testing
           elif [ "$GIT_REF" == "master" ]; then
             echo ::set-output name=server-url::argocd.euc1.s.get-protocol.dev
             echo ::set-output name=token::$EUC1STAGING_TOKEN
-            echo ::set-output name=overlay::$DEPLOY_DIR/overlays/euc1-staging
           elif [ "$GIT_REF" == "production" ]; then
             echo ::set-output name=server-url::argocd.euc1.get-protocol.cloud
             echo ::set-output name=token::$EUC1_TOKEN
-            echo ::set-output name=overlay::$DEPLOY_DIR/overlays/euc1
           fi
         env:
           GIT_REF: ${{ github.ref_name }}
           EUC1TESTING_TOKEN: ${{ secrets.ARGOCD_EUC1TESTING_API_AUTH }}
           EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
-          DEPLOY_DIR: ${{ matrix.DEPLOY_DIR }}
 
-      - run: docker run argoproj/argocd argocd app sync ${{ inputs.argocd_app_name }} --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
+      - run: docker run argoproj/argocd argocd app sync $APP_NAME --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
         env:
           SERVER: ${{ steps.argocd.outputs.server-url }}
           AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
+          APP_NAME: ${{ matrix.APP_NAME }}
 
       # Only triggers if this job fails
       - name: Failure Slack Notification
