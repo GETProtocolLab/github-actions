@@ -9,6 +9,10 @@ on:
       argocd_app_name:
         required: true
         type: string
+      deploy_dir:
+        required: false
+        type: string
+        default: "deploy"
       dockle_whitelist:
         required: false
         type: string
@@ -67,21 +71,22 @@ jobs:
           if [ "$GIT_REF" == "development" ]; then
             echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
             echo ::set-output name=token::$EUC1TESTING_TOKEN
-            echo ::set-output name=overlay::deploy/overlays/euc1-testing
+            echo ::set-output name=overlay::$DEPLOY_DIR/overlays/euc1-testing
           elif [ "$GIT_REF" == "master" ]; then
             echo ::set-output name=server-url::argocd.euc1.s.get-protocol.dev
             echo ::set-output name=token::$EUC1STAGING_TOKEN
-            echo ::set-output name=overlay::deploy/overlays/euc1-staging
+            echo ::set-output name=overlay::$DEPLOY_DIR/overlays/euc1-staging
           elif [ "$GIT_REF" == "production" ]; then
             echo ::set-output name=server-url::argocd.euc1.get-protocol.cloud
             echo ::set-output name=token::$EUC1_TOKEN
-            echo ::set-output name=overlay::deploy/overlays/euc1
+            echo ::set-output name=overlay::$DEPLOY_DIR/overlays/euc1
           fi
         env:
           GIT_REF: ${{ github.ref_name }}
           EUC1TESTING_TOKEN: ${{ secrets.ARGOCD_EUC1TESTING_API_AUTH }}
           EUC1STAGING_TOKEN: ${{ secrets.ARGOCD_EUC1STAGING_API_AUTH }}
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
+          DEPLOY_DIR: ${{ inputs.deploy_dir }}
 
       - name: Generate token
         id: generate_token
