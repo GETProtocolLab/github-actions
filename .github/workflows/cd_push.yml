@@ -108,7 +108,7 @@ jobs:
           IMAGE: ${{ inputs.image }}
           TAG: ${{ github.sha }}
 
-      - uses: actionsx/prettier@v2
+      - uses: actionsx/prettier@v3
         with:
           args: --write ${{ steps.argocd.outputs.overlay }}/kustomization.yml
 
@@ -141,7 +141,7 @@ jobs:
     if: github.ref_name != 'development' && github.ref_name != 'master' && github.ref_name != 'production'
     steps:
       - name: Log in to GitHub Registry
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v2.1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

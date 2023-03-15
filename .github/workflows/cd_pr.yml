@@ -8,7 +8,7 @@ jobs:
     runs-on: [self-hosted, ubuntu20.04-self]
     steps:
       - uses: actions/checkout@v3
-      - uses: actionsx/prettier@v2
+      - uses: actionsx/prettier@v3
         with:
           args: --check ./deploy
 
@@ -36,7 +36,7 @@ jobs:
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
 
       - uses: actions/checkout@v3
-      - uses: imranismail/setup-kustomize@v1
+      - uses: imranismail/setup-kustomize@v2
 
       - uses: GETProtocolLab/argocd-diff-action@master
         name: ArgoCD Diff testing
