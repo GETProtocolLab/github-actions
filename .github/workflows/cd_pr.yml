@@ -27,7 +27,7 @@ jobs:
             echo "token=$EUC1STAGING_TOKEN" >> $GITHUB_OUTPUT
           elif [ "$GIT_REF" == "production" ]; then
             echo "server-url=argocd.euc1.get-protocol.cloud" >> $GITHUB_OUTPUT
-            echo "token=$EUC1_TOKEN" >> $GITHUB_OUTPUT          
+            echo "token=$EUC1_TOKEN" >> $GITHUB_OUTPUT
           fi
         env:
           GIT_REF: ${{ github.base_ref }}
