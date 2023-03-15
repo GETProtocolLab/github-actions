@@ -8,7 +8,7 @@ jobs:
     runs-on: [self-hosted, ubuntu20.04-self]
     steps:
       - uses: actions/checkout@v3
-      - uses: actionsx/prettier@v2
+      - uses: actionsx/prettier@master
         with:
           args: --check ./deploy
 
