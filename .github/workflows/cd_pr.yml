@@ -20,14 +20,14 @@ jobs:
         shell: bash
         run: |
           if [ "$GIT_REF" == "development" ]; then
-            echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
-            echo ::set-output name=token::$EUC1TESTING_TOKEN
+            echo "server-url=argocd.euc1.t.get-protocol.dev" >> $GITHUB_OUTPUT
+            echo "token=$EUC1TESTING_TOKEN" >> $GITHUB_OUTPUT
           elif [ "$GIT_REF" == "master" ]; then
-            echo ::set-output name=server-url::argocd.euc1.s.get-protocol.dev
-            echo ::set-output name=token::$EUC1STAGING_TOKEN
+            echo "server-url=argocd.euc1.s.get-protocol.dev" >> $GITHUB_OUTPUT
+            echo "token=$EUC1STAGING_TOKEN" >> $GITHUB_OUTPUT
           elif [ "$GIT_REF" == "production" ]; then
-            echo ::set-output name=server-url::argocd.euc1.get-protocol.cloud
-            echo ::set-output name=token::$EUC1_TOKEN
+            echo "server-url=argocd.euc1.get-protocol.cloud" >> $GITHUB_OUTPUT
+            echo "token=$EUC1_TOKEN" >> $GITHUB_OUTPUT          
           fi
         env:
           GIT_REF: ${{ github.base_ref }}
