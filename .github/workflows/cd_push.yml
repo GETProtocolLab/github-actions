@@ -29,7 +29,7 @@ jobs:
 
       # Build Docker images
       - name: Build image using docker-build action
-        uses: GETProtocolLab/docker-build-action@v1.0.4
+        uses: GETProtocolLab/docker-build-action@v2
         with:
           password: ${{ secrets.GITHUB_TOKEN }}
           image: ${{ inputs.image }}
