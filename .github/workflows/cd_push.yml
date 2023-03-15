@@ -108,7 +108,7 @@ jobs:
           IMAGE: ${{ inputs.image }}
           TAG: ${{ github.sha }}
 
-      - uses: actionsx/prettier@v3
+      - uses: actionsx/prettier@v2
         with:
           args: --write ${{ steps.argocd.outputs.overlay }}/kustomization.yml
 
