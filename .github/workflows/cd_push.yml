@@ -116,7 +116,7 @@ jobs:
         with:
           commit_message: "[skip ci] Deploy ${{ github.ref_name }} (${{ github.sha }}) to ${{ steps.argocd.outputs.overlay }}"
 
-      - run: docker run argoproj/argocd argocd app sync ${{ inputs.argocd_app_name }} --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
+      - run: docker run argoproj/argocd argocd app -l app.kubernetes.io/name=${{ inputs.argocd_app_name }} --grpc-web --server $SERVER --auth-token $AUTH_TOKEN --prune
         env:
           SERVER: ${{ steps.argocd.outputs.server-url }}
           AUTH_TOKEN: ${{ steps.argocd.outputs.token }}
