@@ -34,7 +34,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           image: ${{ inputs.image }}
           tag: ${{ steps.serialize_branch.outputs.branch }}
-          platforms: "linux/arm64, linux/amd64"
           build_args: |
             REPO_AUTH=${{ secrets.GH_ACCESS_TOKEN }}
           extra_tags: |
