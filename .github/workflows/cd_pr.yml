@@ -8,7 +8,7 @@ jobs:
     runs-on: [self-hosted, ubuntu20.04-self]
     steps:
       - uses: actions/checkout@v3
-      - uses: actionsx/prettier@v2
+      - uses: actionsx/prettier@master
         with:
           args: --check ./deploy
 
@@ -20,14 +20,14 @@ jobs:
         shell: bash
         run: |
           if [ "$GIT_REF" == "development" ]; then
-            echo ::set-output name=server-url::argocd.euc1.t.get-protocol.dev
-            echo ::set-output name=token::$EUC1TESTING_TOKEN
+            echo "server-url=argocd.euc1.t.get-protocol.dev" >> $GITHUB_OUTPUT
+            echo "token=$EUC1TESTING_TOKEN" >> $GITHUB_OUTPUT
           elif [ "$GIT_REF" == "master" ]; then
-            echo ::set-output name=server-url::argocd.euc1.s.get-protocol.dev
-            echo ::set-output name=token::$EUC1STAGING_TOKEN
+            echo "server-url=argocd.euc1.s.get-protocol.dev" >> $GITHUB_OUTPUT
+            echo "token=$EUC1STAGING_TOKEN" >> $GITHUB_OUTPUT
           elif [ "$GIT_REF" == "production" ]; then
-            echo ::set-output name=server-url::argocd.euc1.get-protocol.cloud
-            echo ::set-output name=token::$EUC1_TOKEN
+            echo "server-url=argocd.euc1.get-protocol.cloud" >> $GITHUB_OUTPUT
+            echo "token=$EUC1_TOKEN" >> $GITHUB_OUTPUT
           fi
         env:
           GIT_REF: ${{ github.base_ref }}
@@ -36,7 +36,7 @@ jobs:
           EUC1_TOKEN: ${{ secrets.ARGOCD_EUC1_API_AUTH }}
 
       - uses: actions/checkout@v3
-      - uses: imranismail/setup-kustomize@v1
+      - uses: imranismail/setup-kustomize@v2
 
       - uses: GETProtocolLab/argocd-diff-action@master
         name: ArgoCD Diff testing
