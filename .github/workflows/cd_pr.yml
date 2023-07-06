@@ -14,13 +14,32 @@ jobs:
 
   kuberc:
     runs-on: [self-hosted, ubuntu20.04-self]
+    strategy:
+      fail-fast: false
+      matrix:
+        overlay:
+          [
+            "deploy/overlays/euc1",
+            "deploy/overlays/euc1-testing",
+            "deploy/overlays/euc1-staging",
+          ]
     steps:
       - uses: actions/checkout@v3
-      - run: kubectl kustomize deploy/overlays/euc1"> $RUNNER_TEMP/kuberc-input
-      - uses: MarkArts/kuberc/.github/actions/kuberc@main
+      - id: overlay_exists
+        run: find ${{ matrix.overlay }}
+        continue-on-error: true
+
+      - if: steps.overlay_exists.outcome == 'success'
+        run: kubectl kustomize ${{ matrix.overlay }} > .kuberc-input
+
+      - if: steps.overlay_exists.outcome == 'success'
+        uses: MarkArts/kuberc/.github/actions/kuberc@main
         with:
-          file: ./examples/working-example.yml
-          extra_args: --skip-secrets rabbitmq-connection,newrelic-licence,rds-secret --skip-configmaps s3-configmap,stripeout-elasticache,shitcoins-elasticache,gus-elasticache,entrails-elasticache,stripe-adapter-elasticache,dummy-psp-elasticache --skip-services ingress-nginx-controller
+          file: .kuberc-input
+          extra_flags: |
+            --skip-secrets rabbitmq-connection,newrelic-licence,rds-secret \
+            --skip-configmaps s3-configmap,stripeout-elasticache,shitcoins-elasticache,gus-elasticache,entrails-elasticache,stripe-adapter-elasticache,dummy-psp-elasticache \
+            --skip-services ingress-nginx-controller
 
   argocd_diff:
     runs-on: [self-hosted, ubuntu20.04-self]
