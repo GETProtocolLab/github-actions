@@ -27,9 +27,9 @@ jobs:
         run: echo "branch=$(echo ${{ github.ref_name }} | sed 's/\//-/g')" >> $GITHUB_OUTPUT
         id: serialize_branch
 
-      # Build Docker images
+      # Docker images
       - name: Build image using docker-build action
-        uses: GETProtocolLab/docker-build-action@v3
+        uses: GETProtocolLab/docker-build-action@master
         with:
           password: ${{ secrets.GITHUB_TOKEN }}
           image: ${{ inputs.image }}
