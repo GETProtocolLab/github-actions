@@ -1,9 +1,5 @@
 name: Workflow for building and deploying containers in argocd
 
-permissions:
-  id-token: write
-  contents: read
-
 on:
   workflow_call:
     inputs:
