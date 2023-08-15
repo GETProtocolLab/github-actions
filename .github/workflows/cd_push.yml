@@ -1,5 +1,19 @@
 name: Workflow for building and deploying containers in argocd
 
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+  actions: write
+  checks: write
+  deployments: write
+  issues: write
+  pages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
+
 on:
   workflow_call:
     inputs:
