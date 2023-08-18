@@ -1,5 +1,20 @@
 name: Workflow for building and deploying containers in argocd
 
+# These are the default open permissions + id-token needed for OIDC
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+  actions: write
+  checks: write
+  deployments: write
+  issues: write
+  pages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
+
 on:
   workflow_call:
     inputs:
