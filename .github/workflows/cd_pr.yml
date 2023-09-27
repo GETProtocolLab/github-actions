@@ -33,6 +33,8 @@ jobs:
         uses: actions-hub/kubectl@master
         with:
           args: kustomize ${{ matrix.overlay }} > .kuberc-input
+        env:
+          KUBE_CONFIG: e30K # = {}  action needs a KUBE_CONFIG to be set eventough we only use kustomize
 
       - if: steps.overlay_exists.outcome == 'success'
         uses: MarkArts/kuberc/.github/actions/kuberc@main
