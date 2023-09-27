@@ -29,12 +29,9 @@ jobs:
         run: find ${{ matrix.overlay }}
         continue-on-error: true
 
-      - if: steps.overlay_exists.outcome == 'success'
-        uses: actions-hub/kubectl@master
-        with:
-          args: kustomize ${{ matrix.overlay }} > .kuberc-input
-        env:
-          KUBE_CONFIG: e30K # = {}  action needs a KUBE_CONFIG to be set eventough we only use kustomize
+      - uses: tale/kubectl-action@v1
+
+      - run: kubectl kustomize ${{ matrix.overlay }} > .kuberc-input
 
       - if: steps.overlay_exists.outcome == 'success'
         uses: MarkArts/kuberc/.github/actions/kuberc@main
