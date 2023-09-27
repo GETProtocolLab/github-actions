@@ -30,6 +30,8 @@ jobs:
         continue-on-error: true
 
       - uses: tale/kubectl-action@v1
+        with:
+          base64-kube-config: e30K
 
       - run: kubectl kustomize ${{ matrix.overlay }} > .kuberc-input
 
