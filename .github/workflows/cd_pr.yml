@@ -41,7 +41,7 @@ jobs:
           file: .kuberc-input
           extra_args: |
             --skip-secrets rabbitmq-connection,newrelic-licence,rds-secret \
-            --skip-configmaps s3-configmap,stripeout-elasticache,shitcoins-elasticache,gus-elasticache,entrails-elasticache,stripe-adapter-elasticache,dummy-psp-elasticache,rumen-elasticache \
+            --skip-configmaps s3-configmap,stripeout-elasticache,shitcoins-elasticache,gus-elasticache,entrails-elasticache,stripe-adapter-elasticache,dummy-psp-elasticache,rumen-elasticache,openhaggler-elasticache \
             --skip-services ingress-nginx-controller
 
   argocd_diff:
